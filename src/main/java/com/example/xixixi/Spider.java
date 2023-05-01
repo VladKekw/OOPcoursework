@@ -12,42 +12,48 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.Comparator;
 import java.util.Random;
 
-public class Spider implements Cloneable  {
-    private AnchorPane scene;
+public class Spider implements Cloneable, Comparable<Spider>, Comparator {
+    protected AnchorPane scene;
 
-    private Label name;
-    private Line life;
-    private Label sideLabel;
-    private Circle c;
-    private Image i;
-    private Group g;
+    protected Label name;
+    protected Line life;
+    protected Label sideLabel;
+    protected Circle c;
+    protected Image i;
+    protected Group g;
 
-    public static Image imageSpider;
-    public static ImageView imgvSpider;
+    protected static Image imageSpider;
+    protected static ImageView imageView;
 
-    public Circle circle = new Circle();
-    private double step = 40;
+    protected Circle circle;
+    private int step = 40;
 
-    private boolean side;
-    private boolean active=false;
+
+    private String [] suggestedNames = new String[3];
+
+
+    protected boolean side;
+    protected boolean active=false;
     /*private Point2D point = newRANDpntCreator();*/
-    private static boolean to_Base = false;
+    protected static boolean to_Base = false;
 
 
 
-    private static boolean rnd_move = false;
-    private double x,y;
-    static double newX;
-    static double newY;
+    protected static boolean rnd_move = false;
+    protected double x,y;
+/*    static double newX;
+    static double newY;*/
 
 
     private int healthPoint;
 
     private double damage;
-    static Random random = new Random();
+    protected static Random random = new Random();
     public Group getGroupP(){
         return g;
     }
@@ -62,6 +68,9 @@ public class Spider implements Cloneable  {
         catch (Exception e) {
             damage=0.0;
         }
+    }
+    public String[] getSuggestedNames(){
+        return suggestedNames;
     }
     public String getSide() {if(side){return "Radiant";}else {return "Dire";} }
     public void setSide(String n){
@@ -80,6 +89,12 @@ public class Spider implements Cloneable  {
     public void setActive(Boolean b){
         if(b){active=true;}
         else{active=false;}
+    }
+    public void setStep(int step){
+        this.step =step;
+    }
+    public int getStep(){
+        return this.step;
     }
 
     public String getDamage() {
@@ -134,15 +149,18 @@ public class Spider implements Cloneable  {
         System.out.println("Static initialization is complete!");
     }
 
-    public Spider(int healthPoint, double damage,String n,String s, double posX, double posY){
-        /*this.i = new Image("D:\\JAVA projects\\XIXIXI\\src\\common.png",75,75,false,false);*/
+    public Spider(int healthPoint, double damage,String n,String s, double posX, double posY, String[] spiderN){
         this.i = new Image(Main.class.getResource("common.png").toString(),75,75,false,false);
-        if(active) c.setFill(Color.YELLOW);
+        circle = new Circle(posX+35,posY+60,45);
+        circle.setStrokeWidth(2);
+        if(active) {circle.setFill(Color.YELLOW);}
+        else{circle.setFill(Color.LIGHTBLUE);}
         this.x = posX;
         this.y = posY;
         this.damage = damage;
         this.healthPoint=healthPoint;
-        if(s.equals("Radiant")){side=true;} else if (s.equals("Dire")) {side=false;}
+        this.active=active;
+        if(s.equals("true")){side=true;} else if (s.equals("false")) {side=false;}
         else{
             System.out.println("You`ve entered something wrong!");
         }
@@ -170,29 +188,68 @@ public class Spider implements Cloneable  {
         life.setStrokeWidth(6);
         life.setStroke(Color.GREEN);
 
-        circle = new Circle(posX+35,posY+60,45);
-        circle.setStrokeWidth(2);
-        circle.setFill(Color.LIGHTBLUE);
+        imageView = new ImageView(i);
+        imageView.setX(x-3);
+        imageView.setY(y+15);
+
+        Image img = new Image(Main.class.getResource("heavy.png").toString(),70,70,false,false);
+        if(i.hashCode()==img.hashCode()){
+            if(active) {
+                circle = new Circle(posX+35,posY+60,45);
+                circle.setStrokeWidth(2);
+                circle.setFill(Color.YELLOW);
+            }
+            else{
+                circle = new Circle(posX+35,posY+60,45);
+                circle.setStrokeWidth(2);
+                circle.setFill(Color.BLUE);
+            }
+            if(side){
+                sideLabel=new Label("R:");
+                sideLabel.setLayoutX(posX-20);
+                sideLabel.setLayoutY(posY-6);
+                sideLabel.setTextFill(Color.YELLOW);
+                sideLabel.setFont(new Font(15));
+            }
+            else{sideLabel=new Label("D:");
+                sideLabel.setLayoutX(posX-20);
+                sideLabel.setLayoutY(posY-6);
+                sideLabel.setTextFill(Color.RED);
+                sideLabel.setFont(new Font(15));
+            }
+
+            name=new Label(n);
+            name.setLayoutX(posX);
+            name.setLayoutY(posY-6);
+            name.setTextFill(Color.WHITE);
+            name.setFont(new Font(15));
+
+            life = new Line(x,y+15,x+(healthPoint)/1.55,y+15);
+            life.setStrokeWidth(6);
+            life.setStroke(Color.GREEN);
+
+            imageView = new ImageView(i);
+            imageView.setX(x-3);
+            imageView.setY(y+15);
+        }
 
 
-        imgvSpider= new ImageView(i);
-        imgvSpider.setX(x-3);
-        imgvSpider.setY(y+15);
-
-        g= new Group(circle,imgvSpider,name,sideLabel,life);
+        g= new Group(circle, imageView,name,sideLabel,life);
 
         this.g.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                if(event.getButton().equals(MouseButton.MIDDLE))
+                if(event.getButton().equals(MouseButton.PRIMARY))
                     switchActivation();
+
             }
+
         });
         Main.group.getChildren().addAll(g);
         System.out.println("A spider has been created!");
     }
     public Spider(){
-        this(100,100,"SPIDER","",0,0);
+        this(100,100,"SPIDER","",0,0,Main.bodya);
         System.out.println("A spider without parameters has been created!");
     }
 
@@ -229,7 +286,7 @@ public class Spider implements Cloneable  {
 
     public void moveDown() {
         if (!active) return;
-       /* if(g.getLayoutY()<1000)*/{
+        if(g.getLayoutY()<1000){
         double y = g.getLayoutY() + step;
         g.setLayoutY(y);
         }
@@ -299,11 +356,6 @@ public class Spider implements Cloneable  {
 
     }*/
 
-
-
-
-
-
    /*     if (Spider.rnd_move && !Spider.to_Base) {
             int x = (int) g.getLayoutX();
             int y = (int) g.getLayoutY();
@@ -363,8 +415,15 @@ public class Spider implements Cloneable  {
                 ", side=" +side+
                 ", x=" + x +
                 ", y=" + y +
+                ", active="+ active+
                 '}';
     }
+
+    @Override
+    public int compare(Object o1, Object o2) {
+        return 0;
+    }
+
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
@@ -375,6 +434,10 @@ public class Spider implements Cloneable  {
                 healthPoint == spider.healthPoint;
     }
 
+    @Override
+    public int compareTo(@NotNull Spider o) {
+        return 0;
+    }
 }
 
 

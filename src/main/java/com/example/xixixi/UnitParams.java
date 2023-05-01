@@ -1,71 +1,124 @@
 package com.example.xixixi;
 
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
+import java.util.Random;
 
 public class UnitParams {
+
+    static boolean active;
+    static Random random = new Random();
+    static boolean side;
+    static int option;
+    private static ToggleGroup gr;
+
     public static void displayUnit(double x, double y) {
 
-    Stage window=new Stage();
-    window.initModality(Modality.APPLICATION_MODAL);
-    window.setTitle("Enter new unit parameters!");
-    window.setMinWidth(400);
-    window.setMinHeight(500);
 
 
-    VBox layout = new VBox(11);
-    //layout.getChildren().addAll(label, closeButton);
-    layout.setAlignment(Pos.CENTER);
+
+        Stage window=new Stage();
+        window.initModality(Modality.APPLICATION_MODAL);
+        window.setTitle("Enter new unit parameters!");
+        window.setMinWidth(400);
+        window.setMinHeight(700);
 
 
-    Label nameLabel=new Label();
-    nameLabel.setText("Name:");
-    TextField nameText = new TextField();
-
-    Label damageLabel=new Label();
-    damageLabel.setText("Damage:");
-    TextField damageText = new TextField();
-
-    Label healthLabel=new Label();
-    healthLabel.setText("Health:");
-    TextField healthText = new TextField();
-
-    Label sideLabel= new Label();
-    sideLabel.setText("Side:");
-    TextField sideText = new TextField();
+        VBox layout = new VBox(11);
+        //layout.getChildren().addAll(label, closeButton);
+        layout.setAlignment(Pos.BASELINE_LEFT);
 
 
-    Label xLabel=new Label();
-    xLabel.setText("X:");
-    TextField xText = new TextField();
-    xText.setText(Double.toString(x));
+        Label nameLabel=new Label();
+        nameLabel.setText("Name:");
+        TextField nameText = new TextField();
 
-    Label yLabel=new Label();
-    yLabel.setText("Y:");
-    TextField yText = new TextField();
-    yText.setText(Double.toString(y));
+        String[] someNames =  Main.createSuggestedNames();
+        nameText.setText(someNames[random.nextInt(3)]);
+
+
+       /* nameText.setText();*/
+
+        Label damageLabel=new Label();
+        damageLabel.setText("Damage:");
+        TextField damageText = new TextField();
+
+        Label healthLabel=new Label();
+        healthLabel.setText("Health:");
+        TextField healthText = new TextField();
+
+        Label xLabel=new Label();
+        xLabel.setText("X:");
+        TextField xText = new TextField();
+        xText.setText(Double.toString(x));
+
+        Label yLabel=new Label();
+        yLabel.setText("Y:");
+        TextField yText = new TextField();
+        yText.setText(Double.toString(y));
+
+        gr = new ToggleGroup();
+
+        RadioButton rad = new RadioButton("Radiant side");
+        rad.setToggleGroup(gr);
+        rad.setOnAction(new EventHandler<ActionEvent>(){
+            @Override
+            public void handle(ActionEvent event){
+                side = true;
+            }
+                        });
+        RadioButton dire = new RadioButton("Dire side");
+        dire.setToggleGroup(gr);
+        dire.setOnAction(new EventHandler<ActionEvent>(){
+            @Override
+            public void handle(ActionEvent event){
+                side = false;
+            }
+        });
+
+        Label cLabel = new Label();
+        cLabel.setText("Choose type of the Unit:");
+        ComboBox comboBox = new ComboBox<>();
+        comboBox.getItems().addAll(
+                "1. Spider",
+                "2. Golem",
+                "3. Ice Elemental"
+        );
+
+
         Button okButton=new Button("OK");
         okButton.setOnAction(e->{
 
             String sName= nameText.getText();
             String sDamage = damageText.getText();
             String sHealth= healthText.getText();
-            String sSide = sideText.getText();
+            String sSide = Boolean.toString(side);
             String sX = xText.getText();
             String sY = yText.getText();
+            /*String sA =Boolean.toString(active);*/
 
-            Main.createNewSpider(sName,sDamage,sHealth,sSide, sX, sY);
+
+            if(comboBox.getValue()=="1. Spider"){
+            Main.createNewSpider(sName,sDamage,sHealth,sSide, sX, sY, someNames);}
+
+            if(comboBox.getValue()=="2. Golem"){
+                Main.createNewGolem(sName,sDamage,sHealth,sSide, sX, sY, someNames);
+            }
 
             window.close();});
-            layout.getChildren().addAll(nameLabel, nameText, healthLabel, healthText,damageLabel,damageText,sideLabel,sideText, xLabel, xText, yLabel, yText, okButton);
+            layout.getChildren().addAll(nameLabel, nameText, healthLabel, healthText,
+                    damageLabel,damageText,
+                    xLabel, xText, yLabel, yText,rad,dire,
+                    cLabel,comboBox, okButton);
             Scene scene=new Scene(layout,303,300);
             window.setScene(scene);
             window.showAndWait();
         }
+
 }

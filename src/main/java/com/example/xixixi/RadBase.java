@@ -11,11 +11,11 @@ import javafx.scene.text.Font;
 import java.io.FileNotFoundException;
 
 public class RadBase {
-    Image i;
-    ImageView iv;
-    Rectangle r;
-    Group g;
-    Label l;
+    private Image i;
+    private ImageView iv;
+    private Rectangle r;
+    public Group g;
+    private Label l;
 
     RadBase(double x, double y) throws FileNotFoundException {
 
@@ -32,8 +32,9 @@ public class RadBase {
         this.l.setTranslateX(x+15);
         this.l.setTranslateY(y+100);
 
-        this.r = new Rectangle(x, y, 150, 150);
+        this.r = new Rectangle(x-28, y-30, 150, 150);
         this.r.setFill(Color.TRANSPARENT);
+        this.r.setStroke(Color.WHITE);
 
         this.g = new Group();
         this.g.getChildren().addAll(this.r, this.iv, this.l);

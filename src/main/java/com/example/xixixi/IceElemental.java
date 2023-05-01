@@ -1,3 +1,4 @@
+/*
 package com.example.xixixi;
 
 public class IceElemental extends Golem{
@@ -5,3 +6,4 @@ public class IceElemental extends Golem{
     int damage = 60;
     int attackRange = 75;
 }
+*/

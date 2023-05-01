@@ -11,11 +11,11 @@ import javafx.scene.text.Font;
 import java.io.FileNotFoundException;
 
 public class DireBase {
-    Image i;
-    ImageView iv;
-    Rectangle r;
-    Group g;
-    Label l;
+    private Image i;
+    private ImageView iv;
+    private Rectangle r;
+    public Group g;
+    private Label l;
 
     DireBase(double x, double y) throws FileNotFoundException {
 
@@ -23,7 +23,7 @@ public class DireBase {
         ImageView imageView = new ImageView(i);
         imageView.setX(x);
         imageView.setY(y);
-        imageView.setPreserveRatio(true); //Setting the preserve ratio of the image view
+        imageView.setPreserveRatio(true);
         this.iv = imageView;
 
         this.l = new Label("Dire");
@@ -32,8 +32,10 @@ public class DireBase {
         this.l.setTranslateX(x+33);
         this.l.setTranslateY(y+100);
 
-        this.r = new Rectangle(x, y, 150, 150);
+        this.r = new Rectangle(x-28, y-30, 150, 150);
         this.r.setFill(Color.TRANSPARENT);
+        this.r.setStroke(Color.WHITE);
+
 
         this.g = new Group();
         this.g.getChildren().addAll(this.r, this.iv, this.l);

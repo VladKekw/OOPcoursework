@@ -19,7 +19,7 @@ public class Background {
     static Group gr = new Group();
     static Group g;
     Background() throws FileNotFoundException {
-        img = new Image(Main.class.getResource("background.jpg").toString(),1920,1080,false,false);
+        img = new Image(Main.class.getResource("background.jpg").toString(),1560,800,false,false);
         ImageView imageView = new ImageView(img);
         this.iv = imageView;
 

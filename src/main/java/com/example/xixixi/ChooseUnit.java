@@ -12,37 +12,46 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 
 public class ChooseUnit {
-    public static void choose(double x, double y){
+    public static void choose(){
     Stage window=new Stage();
     window.initModality(Modality.APPLICATION_MODAL);
     window.setTitle("Choose unit!");
     window.setMinWidth(200);
     window.setMinHeight(200);
-        ArrayList<String> spiders = Main.getNames();
+        ArrayList<String> spiders = Main.getSpiderNames();
+        ArrayList<String> golems = Main.getGolemNames();
 
         Label label= new Label("Choose an object to change");
 
         ComboBox cBox = new ComboBox();
 
-        int count=1;
+        int countS=1;
         for( String s:spiders ) {
-            cBox.getItems().add(Integer.toString(count)+" "+ s);
-            count++;
+
+            cBox.getItems().add(countS +" "+ s);
+            countS++;
+        }
+        int countG=1;
+        for(String g: golems){
+
+            cBox.getItems().add(countG +" "+ g);
+            countG++;
         }
 
         VBox layout = new VBox(11);
-        //layout.getChildren().addAll(label, closeButton);
         layout.setAlignment(Pos.CENTER);
 
         Button okButton=new Button("OK");
         okButton.setOnAction(e->{
-            if( cBox.getValue()!=null ){
-                String[] strChoice= cBox.getValue().toString().split(" ");
-                //System.out.println("Message from String.split:"+ Arrays.toString(strChoice));
+            if( cBox.getValue()!=null ) {
+                String[] strChoice = cBox.getValue().toString().split(" ");
+                if (cBox.getValue().toString().contains("Spider")) {
+                    ChangeUnitParams.display(Integer.parseInt(strChoice[0]), "spider");
+                }
 
-                ChangeUnitParams.display(Integer.parseInt(strChoice[0])-1 );
-
-
+                if (cBox.getValue().toString().contains("Golem")) {
+                    ChangeUnitParams.display(Integer.parseInt(strChoice[0]), "golem");
+                }
             }
 
             window.close();});
@@ -50,6 +59,7 @@ public class ChooseUnit {
         Scene scene=new Scene(layout,303,300);
         window.setScene(scene);
         window.showAndWait();
+
 
     }
 }
