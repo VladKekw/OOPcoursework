@@ -23,15 +23,13 @@ public class Spider implements Cloneable, Comparable<Spider>, Comparator {
     protected Label name;
     protected Line life;
     protected Label sideLabel;
-    protected Circle c;
     protected Image i;
     protected Group g;
 
-    protected static Image imageSpider;
-    protected static ImageView imageView;
+    protected  ImageView imageView;
 
     protected Circle circle;
-    private int step = 40;
+    protected int step = 40;
 
 
     private String [] suggestedNames = new String[3];
@@ -74,8 +72,8 @@ public class Spider implements Cloneable, Comparable<Spider>, Comparator {
     }
     public String getSide() {if(side){return "Radiant";}else {return "Dire";} }
     public void setSide(String n){
-        if (n.equals("Radiant")) {side = true;
-        }else if (n.equals("Dire")){side=false;}
+        if (n.equals("true")) {side = true;
+        }else if (n.equals("false")){side=false;}
         else{System.out.println("You`ve entered something wrong!");}
 
     }
@@ -149,17 +147,22 @@ public class Spider implements Cloneable, Comparable<Spider>, Comparator {
         System.out.println("Static initialization is complete!");
     }
 
-    public Spider(int healthPoint, double damage,String n,String s, double posX, double posY, String[] spiderN){
+    public Spider(int healthPoint, double damage,String n,String s, double posX, double posY, String[] spiderN) {
         this.i = new Image(Main.class.getResource("common.png").toString(),75,75,false,false);
-        circle = new Circle(posX+35,posY+60,45);
+        this.imageView = new ImageView(i);
+        imageView.setX(x-3);
+        imageView.setY(y+15);
+
+        this.circle = new Circle(posX+35,posY+60,45);
         circle.setStrokeWidth(2);
         if(active) {circle.setFill(Color.YELLOW);}
         else{circle.setFill(Color.LIGHTBLUE);}
+
         this.x = posX;
         this.y = posY;
         this.damage = damage;
         this.healthPoint=healthPoint;
-        this.active=active;
+
         if(s.equals("true")){side=true;} else if (s.equals("false")) {side=false;}
         else{
             System.out.println("You`ve entered something wrong!");
@@ -188,60 +191,13 @@ public class Spider implements Cloneable, Comparable<Spider>, Comparator {
         life.setStrokeWidth(6);
         life.setStroke(Color.GREEN);
 
-        imageView = new ImageView(i);
-        imageView.setX(x-3);
-        imageView.setY(y+15);
-
-        Image img = new Image(Main.class.getResource("heavy.png").toString(),70,70,false,false);
-        if(i.hashCode()==img.hashCode()){
-            if(active) {
-                circle = new Circle(posX+35,posY+60,45);
-                circle.setStrokeWidth(2);
-                circle.setFill(Color.YELLOW);
-            }
-            else{
-                circle = new Circle(posX+35,posY+60,45);
-                circle.setStrokeWidth(2);
-                circle.setFill(Color.BLUE);
-            }
-            if(side){
-                sideLabel=new Label("R:");
-                sideLabel.setLayoutX(posX-20);
-                sideLabel.setLayoutY(posY-6);
-                sideLabel.setTextFill(Color.YELLOW);
-                sideLabel.setFont(new Font(15));
-            }
-            else{sideLabel=new Label("D:");
-                sideLabel.setLayoutX(posX-20);
-                sideLabel.setLayoutY(posY-6);
-                sideLabel.setTextFill(Color.RED);
-                sideLabel.setFont(new Font(15));
-            }
-
-            name=new Label(n);
-            name.setLayoutX(posX);
-            name.setLayoutY(posY-6);
-            name.setTextFill(Color.WHITE);
-            name.setFont(new Font(15));
-
-            life = new Line(x,y+15,x+(healthPoint)/1.55,y+15);
-            life.setStrokeWidth(6);
-            life.setStroke(Color.GREEN);
-
-            imageView = new ImageView(i);
-            imageView.setX(x-3);
-            imageView.setY(y+15);
-        }
-
-
-        g= new Group(circle, imageView,name,sideLabel,life);
+        g = new Group(circle,imageView,life,name,sideLabel);
 
         this.g.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 if(event.getButton().equals(MouseButton.PRIMARY))
                     switchActivation();
-
             }
 
         });
@@ -262,7 +218,7 @@ public class Spider implements Cloneable, Comparable<Spider>, Comparator {
     }
     public void moveLeft() {
         if (!active) return;
-       /* if (g.getLayoutX() > 1 )*/{
+        if (g.getLayoutX() > 1 ){
             double y = g.getLayoutX() - step;
             g.setLayoutX(y);
         }
@@ -270,7 +226,7 @@ public class Spider implements Cloneable, Comparable<Spider>, Comparator {
 
     public void moveUp() {
         if (!active) return;
-       /* if(g.getLayoutY()>1)*/ {
+        if(g.getLayoutY()>1) {
             double y = g.getLayoutY() - step;
             g.setLayoutY(y);
         }
@@ -278,7 +234,7 @@ public class Spider implements Cloneable, Comparable<Spider>, Comparator {
 
     public void moveRight() {
         if (!active) return;
-       /* if(g.getLayoutX()<1920)*/ {
+        if(g.getLayoutX()<1480) {
             double x = g.getLayoutX() + step;
             g.setLayoutX(x);
         }
@@ -286,7 +242,7 @@ public class Spider implements Cloneable, Comparable<Spider>, Comparator {
 
     public void moveDown() {
         if (!active) return;
-        if(g.getLayoutY()<1000){
+        if(g.getLayoutY()<690){
         double y = g.getLayoutY() + step;
         g.setLayoutY(y);
         }

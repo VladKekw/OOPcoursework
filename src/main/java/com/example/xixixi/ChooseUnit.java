@@ -20,7 +20,7 @@ public class ChooseUnit {
     window.setMinHeight(200);
         ArrayList<String> spiders = Main.getSpiderNames();
         ArrayList<String> golems = Main.getGolemNames();
-
+        ArrayList<String> elems = Main.getElemNames();
         Label label= new Label("Choose an object to change");
 
         ComboBox cBox = new ComboBox();
@@ -37,6 +37,11 @@ public class ChooseUnit {
             cBox.getItems().add(countG +" "+ g);
             countG++;
         }
+        int countI=1;
+        for (String i: elems ){
+            cBox.getItems().add(countI +" "+ i);
+            countI++;
+        }
 
         VBox layout = new VBox(11);
         layout.setAlignment(Pos.CENTER);
@@ -51,6 +56,9 @@ public class ChooseUnit {
 
                 if (cBox.getValue().toString().contains("Golem")) {
                     ChangeUnitParams.display(Integer.parseInt(strChoice[0]), "golem");
+                }
+                if(cBox.getValue().toString().contains("IceElemental")){
+                    ChangeUnitParams.display(Integer.parseInt(strChoice[0]), "iceElemental");
                 }
             }
 

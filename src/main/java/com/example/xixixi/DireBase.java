@@ -9,12 +9,14 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 
 public class DireBase {
     private Image i;
     private ImageView iv;
     private Rectangle r;
-    public Group g;
+    public Group direBaseGroup;
+    public static ArrayList<Spider> DireBase=new ArrayList<>(15);
     private Label l;
 
     DireBase(double x, double y) throws FileNotFoundException {
@@ -37,8 +39,8 @@ public class DireBase {
         this.r.setStroke(Color.WHITE);
 
 
-        this.g = new Group();
-        this.g.getChildren().addAll(this.r, this.iv, this.l);
+        this.direBaseGroup = new Group();
+        this.direBaseGroup.getChildren().addAll(this.r, this.iv, this.l);
 
     }
 }

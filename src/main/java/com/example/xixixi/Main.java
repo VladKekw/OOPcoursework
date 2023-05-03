@@ -3,8 +3,6 @@ package com.example.xixixi;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
@@ -25,14 +23,14 @@ public class Main extends Application {
     public static Background bg;
     static Random random = new Random();
     public static DireBase direBase;
+
     public static RadBase radBase;
 
     public static AnchorPane group = new AnchorPane();
-
+    public static ArrayList<Spider> uni = new ArrayList<>();
     public static ArrayList<Spider> web = new ArrayList<>();
-    public static ArrayList<Object> uni = new ArrayList<>();
     public static ArrayList<Golem> cave = new ArrayList<>();
-/*    public static ArrayList<IceElemental> river = new ArrayList<>();*/
+    public static ArrayList<IceElemental> river = new ArrayList<>();
 
     public static final String [] NAMES = {"Darien","Dewayne","Freddy"
             ,"Purdie","Wilton","Godfrey",
@@ -43,7 +41,7 @@ public class Main extends Application {
     public static String[] createSuggestedNames(){
         String[] names = new String[3];
         for(int i=0; i<3; i++){
-            names[i]= NAMES[random.nextInt(9)];
+            names[i]= NAMES[random.nextInt(10)];
         }
         return names;
     }
@@ -66,9 +64,17 @@ public class Main extends Application {
 
         return golemNames;
     }
+    public static ArrayList<String> getElemNames(){
+        ArrayList<String> elemNames = new ArrayList<>();
+
+        for( IceElemental i: river ){
+            elemNames.add(i.toString() );
+        }
+        return elemNames;
+    }
     public static ArrayList<String> SpiderGetParamsToChange(int index ){
         Spider s= web.get(index-1);
-        ArrayList<String> array= new ArrayList<String>();
+        ArrayList<String> array= new ArrayList<>();
         array.add( s.getName() );
         array.add( s.getHealthPoint() );
         array.add(s.getDamage());
@@ -80,13 +86,25 @@ public class Main extends Application {
     public static ArrayList<String> GolemGetParamsToChange2(int index ){
         Golem g= cave.get(index-1);
 
-        ArrayList<String> array= new ArrayList<String>();
+        ArrayList<String> array= new ArrayList<>();
         array.add( g.getName() );
         array.add( g.getHealthPoint() );
         array.add(g.getDamage());
         array.add(g.getSide());
         array.add( g.getX() );
         array.add( g.getY() );
+        return array;
+    }
+    public static ArrayList<String> IceElementalGetParamsToChange3(int index ){
+        IceElemental ice= river.get(index-1);
+
+        ArrayList<String> array= new ArrayList<>();
+        array.add( ice.getName() );
+        array.add( ice.getHealthPoint() );
+        array.add(ice.getDamage());
+        array.add(ice.getSide());
+        array.add( ice.getX() );
+        array.add( ice.getY() );
         return array;
     }
 
@@ -104,42 +122,17 @@ public class Main extends Application {
         if( sName.equals("") ) sName="Spider";
 
         int h;
-        try {
-            h= Integer.parseInt(sHealth);
-        }
-        catch(Exception e){
-            h=100;
-        }
+        try {h= Integer.parseInt(sHealth);}
+        catch(Exception e){h=100;}
         double d;
-        try {
-            d= Double.parseDouble(sDamage);
-        }
-        catch(Exception e){
-            d=100.0;
-        }
-
+        try {d= Double.parseDouble(sDamage);}
+        catch(Exception e){d=100.0;}
         double x;
-        try {
-            x= Double.parseDouble(sX);
-        }
-        catch(Exception e){
-            x=0.0;
-        }
+        try {x= Double.parseDouble(sX);}
+        catch(Exception e){x=0.0;}
         double y;
-        try {
-            y= Double.parseDouble(sY);
-        }
-        catch(Exception e){
-            y=0.0;
-        }
-        boolean a;
-        try{
-            /*a=Boolean.parseBoolean(sActive);*/
-        }
-        catch(Exception e) {
-            a=false;
-        }
-
+        try {y= Double.parseDouble(sY);}
+        catch(Exception e){y=0.0;}
         Main.web.add(new Spider(h,d, sName,sSide,x,y,sP) );
     }
     public static void createNewGolem(String sName,String sDamage, String sHealth,String sSide, String sX, String sY, String[] sP ){
@@ -149,54 +142,57 @@ public class Main extends Application {
         if( sName.equals("") ) sName="Golem";
 
         int h;
-        try {
-            h= Integer.parseInt(sHealth);
-        }
-        catch(Exception e){
-            h=100;
-        }
+        try {h= Integer.parseInt(sHealth);}
+        catch(Exception e){h=100;}
         double d;
-        try {
-            d= Double.parseDouble(sDamage);
-        }
-        catch(Exception e){
-            d=100.0;
-        }
+        try {d= Double.parseDouble(sDamage);}
+        catch(Exception e){d=100.0;}
 
         double x;
-        try {
-            x= Double.parseDouble(sX);
-        }
-        catch(Exception e){
-            x=0.0;
-        }
+        try {x= Double.parseDouble(sX);}
+        catch(Exception e){x=0.0;}
         double y;
-        try {
-            y= Double.parseDouble(sY);
-        }
-        catch(Exception e){
-            y=0.0;
-        }
-        boolean a;
-        try{
-            /*a=Boolean.parseBoolean(sActive);*/
-        }
-        catch(Exception e) {
-            a=false;
-        }
-
+        try {y= Double.parseDouble(sY);}
+        catch(Exception e){y=0.0;}
         Main.cave.add(new Golem(h,d, sName,sSide,x,y,sP) );
+
+    }
+    public static void createNewIceElemental(String sName,String sDamage, String sHealth,String sSide, String sX, String sY, String[] sP ){
+
+        System.out.printf("gName=%s gHealth=%s gDamage=%s gSide = %S gX=%s gY=%s \n", sName, sHealth,sDamage,sSide, sX, sY );
+
+        if( sName.equals("") ) sName="Ice Elemental";
+
+        int h;
+        try {h= Integer.parseInt(sHealth);}
+        catch(Exception e){h=100;}
+        double d;
+        try {d= Double.parseDouble(sDamage);}
+        catch(Exception e){d=100.0;}
+
+        double x;
+        try {x= Double.parseDouble(sX);}
+        catch(Exception e){x=0.0;}
+        double y;
+        try {y= Double.parseDouble(sY);}
+        catch(Exception e){y=0.0;}
+        Main.river.add(new IceElemental(h,d, sName,sSide,x,y,sP) );
     }
 
     @Override
     public void start(Stage stage) throws Exception {
        SpawnBackground();
 
-       direBase = new DireBase(1100,300);
-       group.getChildren().add(direBase.g);
+       Tower tower1 = new Tower(900,200,"NorthEastern Tower");
+       Tower tower2 = new Tower(370,500,"SouthWestern Tower");
+       Tower tower3 = new Tower(700,330,"MiddleEarth Tower");
+       group.getChildren().addAll(tower1.towerGroup,tower2.towerGroup,tower3.towerGroup);
 
-        radBase = new RadBase(480,260);
-        group.getChildren().add(radBase.g);
+       direBase = new DireBase(1200,260);
+       group.getChildren().add(direBase.direBaseGroup);
+
+        radBase = new RadBase(230,260);
+        group.getChildren().add(radBase.RadiantBaseGroup);
 
         Scene scene = new Scene(group, 1560, 800);
         scene.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -244,6 +240,16 @@ public class Main extends Application {
 
                         }
                     }
+                    for(Golem golem:cave){
+                        if(golem.isActive()){
+                            golem.switchActivation();
+                        }
+                    }
+                    for(IceElemental ice :river){
+                        if(ice.isActive()){
+                            ice.switchActivation();
+                        }
+                    }
 
                 }
                 if(keyEvent.getCode()==KeyCode.INSERT){
@@ -258,6 +264,10 @@ public class Main extends Application {
                         if(golem.isActive())
                         golem.moveUp();
                     }
+                    for(IceElemental ice: river){
+                        if(ice.isActive())
+                            ice.moveUp();
+                    }
                 }  if (keyEvent.getCode()==KeyCode.DOWN) {
                     for (Spider spider:web){
                         if(spider.isActive())
@@ -266,6 +276,10 @@ public class Main extends Application {
                     for(Golem golem: cave){
                         if(golem.isActive())
                         golem.moveDown();
+                    }
+                    for(IceElemental ice: river){
+                        if(ice.isActive())
+                            ice.moveDown();
                     }
                 }
                 if(keyEvent.getCode()==KeyCode.RIGHT){
@@ -277,6 +291,10 @@ public class Main extends Application {
                         if(golem.isActive())
                         golem.moveRight();
                     }
+                    for(IceElemental ice: river){
+                        if(ice.isActive())
+                            ice.moveRight();
+                    }
                        }
                 if(keyEvent.getCode()==KeyCode.LEFT){
                     for (Spider spider:web){
@@ -286,6 +304,10 @@ public class Main extends Application {
                     for(Golem golem: cave){
                         if(golem.isActive())
                         golem.moveLeft();
+                    }
+                    for(IceElemental ice: river){
+                        if(ice.isActive())
+                            ice.moveLeft();
                     }
                 }
                 if(keyEvent.getCode()==KeyCode.R){

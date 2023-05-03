@@ -14,7 +14,7 @@ public class Background {
     Image img;
     public  static ImageView iv;
     Label l;
-    private static Group grp;
+    private static Group BackgroundGroup;
     public static Rectangle border;
     static Group gr = new Group();
     static Group g;
@@ -28,8 +28,8 @@ public class Background {
         border.setFill(Color.TRANSPARENT);
         border.setStroke(Color.RED);
 
-        grp = new Group(this.iv,border);
-        Group sub = new Group( grp);
+        BackgroundGroup = new Group(this.iv,border);
+        Group sub = new Group(BackgroundGroup);
 
         this.g = sub;
     }

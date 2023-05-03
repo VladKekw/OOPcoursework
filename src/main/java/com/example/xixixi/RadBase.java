@@ -9,12 +9,14 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 
 public class RadBase {
     private Image i;
     private ImageView iv;
     private Rectangle r;
-    public Group g;
+    public Group RadiantBaseGroup;
+    public static ArrayList<Spider> RadBase=new ArrayList<>(15);
     private Label l;
 
     RadBase(double x, double y) throws FileNotFoundException {
@@ -36,8 +38,9 @@ public class RadBase {
         this.r.setFill(Color.TRANSPARENT);
         this.r.setStroke(Color.WHITE);
 
-        this.g = new Group();
-        this.g.getChildren().addAll(this.r, this.iv, this.l);
+        this.RadiantBaseGroup = new Group();
+        this.RadiantBaseGroup.getChildren().addAll(this.r, this.iv, this.l);
+
 
     }
 }

@@ -110,7 +110,9 @@ public class UnitParams {
             if(comboBox.getValue()=="2. Golem"){
                 Main.createNewGolem(sName,sDamage,sHealth,sSide, sX, sY, someNames);
             }
-
+            if(comboBox.getValue()=="3. Ice Elemental"){
+                Main.createNewIceElemental(sName,sDamage,sHealth,sSide, sX, sY, someNames);
+            }
             window.close();});
             layout.getChildren().addAll(nameLabel, nameText, healthLabel, healthText,
                     damageLabel,damageText,
