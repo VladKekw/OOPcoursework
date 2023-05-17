@@ -20,20 +20,15 @@ public class UnitParams {
 
     public static void displayUnit(double x, double y) {
 
-
-
-
         Stage window=new Stage();
         window.initModality(Modality.APPLICATION_MODAL);
         window.setTitle("Enter new unit parameters!");
         window.setMinWidth(400);
         window.setMinHeight(700);
 
-
         VBox layout = new VBox(11);
         //layout.getChildren().addAll(label, closeButton);
-        layout.setAlignment(Pos.BASELINE_LEFT);
-
+        layout.setAlignment(Pos.CENTER);
 
         Label nameLabel=new Label();
         nameLabel.setText("Name:");
@@ -41,9 +36,6 @@ public class UnitParams {
 
         String[] someNames =  Main.createSuggestedNames();
         nameText.setText(someNames[random.nextInt(3)]);
-
-
-       /* nameText.setText();*/
 
         Label damageLabel=new Label();
         damageLabel.setText("Damage:");

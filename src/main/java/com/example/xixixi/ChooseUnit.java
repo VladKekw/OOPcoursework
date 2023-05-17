@@ -42,6 +42,10 @@ public class ChooseUnit {
             cBox.getItems().add(countI +" "+ i);
             countI++;
         }
+        ComboBox c = new ComboBox();
+        for(Spider s: Main.uni){
+            c.getItems().add(s);
+        }
 
         VBox layout = new VBox(11);
         layout.setAlignment(Pos.CENTER);
@@ -63,11 +67,12 @@ public class ChooseUnit {
             }
 
             window.close();});
-        layout.getChildren().addAll(label,cBox,okButton);
+        layout.getChildren().addAll(label,cBox,c,okButton);
         Scene scene=new Scene(layout,303,300);
         window.setScene(scene);
         window.showAndWait();
 
 
     }
+
 }

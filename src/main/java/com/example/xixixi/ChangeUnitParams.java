@@ -95,7 +95,7 @@ public class ChangeUnitParams {
                 life.setStroke(Color.GREEN);
 
 
-                Main.createNewSpider(sName, sDamage,sHealth,sSide, sX, sY,spiderNames );
+                Main.changeSpider(sName, sDamage,sHealth,sSide, sX, sY,spiderNames,index-1 );
                 window.close();});
             layout.getChildren().addAll(nameLabel, nameText, healthLabel, healthText,
                     damageLabel,damageText, xLabel, xText, yLabel, yText,
@@ -162,13 +162,13 @@ public class ChangeUnitParams {
                 life.setStroke(Color.GREEN);
 
 
-                Main.createNewGolem(sName, sDamage,sHealth,sSide, sX, sY,spiderNames );
+                Main.changeGolem(sName, sDamage,sHealth,sSide, sX, sY,spiderNames,index-1 );
                 window.close();});
             layout.getChildren().addAll(nameLabel, nameText, healthLabel, healthText,
                     damageLabel,damageText, xLabel, xText, yLabel, yText,
                     rad,dire, okButton);
         }
-        if(s.equals("spider")){
+        if(s.equals("iceElemental")){
             IceElementalParamsToChange = Main.IceElementalGetParamsToChange3( index);
             Label nameLabel=new Label();
             nameLabel.setText("Name:");
@@ -229,7 +229,7 @@ public class ChangeUnitParams {
                 life.setStroke(Color.GREEN);
 
 
-                Main.createNewIceElemental(sName, sDamage,sHealth,sSide, sX, sY,spiderNames );
+                Main.changeIceElemental(sName, sDamage,sHealth,sSide, sX, sY,spiderNames,index-1 );
                 window.close();});
             layout.getChildren().addAll(nameLabel, nameText, healthLabel, healthText,
                     damageLabel,damageText, xLabel, xText, yLabel, yText,
