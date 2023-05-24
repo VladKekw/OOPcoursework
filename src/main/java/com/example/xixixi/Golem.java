@@ -44,8 +44,8 @@ public class Golem extends Spider{
     public String toString() {
         return "Golem{" + "name=" + name.getText() +
                 ", damage=" + getDamage() + ", health=" + getHealthPoint() + ", side="
-                + side + ", x=" + getPosX() + ", y=" + getPosY()+ ", suggested names"+
-                getSuggestedNames().toString() + ", active=" + active + ", safe+"+getSafe() +'}';
+                + side + ", x=" + getPosX() + ", y=" + getPosY()+ ", survived seconds"+
+                getSurvived() + ", active=" + active + ", safe+"+getSafe() +'}';
     }
     public boolean equals(Object obj) {
         if (this == obj) return true;

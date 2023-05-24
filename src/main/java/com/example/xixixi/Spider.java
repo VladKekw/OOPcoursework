@@ -19,8 +19,13 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Comparator;
 import java.util.Random;
 
-public class Spider implements Cloneable, Comparable<Spider>, Comparator {
+interface Predict{
+  void predictTheWin();
+}
+
+public class Spider implements Predict, Cloneable, Comparable<Spider>, Comparator {
     protected ScrollPane scene;
+    static Logger logger = new Logger("D:\\units.txt");
 
     protected Label name = new Label();
     protected Line life = new Line();
@@ -274,6 +279,7 @@ public class Spider implements Cloneable, Comparable<Spider>, Comparator {
 
         g = new Group(circle, imageView, life, name,survived,  sideLabel);
         Main.group.getChildren().addAll(g);
+
         g.relocate(posX, posY);
     }
 
@@ -292,6 +298,11 @@ public class Spider implements Cloneable, Comparable<Spider>, Comparator {
         imageView.setX(x - 3);
         imageView.setY(y + 15);
         init(counter,posX,posY);
+        predictTheWin();
+
+
+        Logger logger =new Logger("D:\\ 1.txt");
+        logger.log(this.toString());
 
         this.g.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
@@ -301,7 +312,7 @@ public class Spider implements Cloneable, Comparable<Spider>, Comparator {
 
         });
 
-        System.out.println("A spider has been created!");
+
     }
 
     public Spider() {
@@ -360,6 +371,7 @@ public class Spider implements Cloneable, Comparable<Spider>, Comparator {
         else return null;
     }
 
+
     public void updateSecondsText(SurvivedCounter c){
 
         this.survived.setText(Integer.toString(c.getSecondsSurvived()/60));
@@ -372,33 +384,48 @@ public class Spider implements Cloneable, Comparable<Spider>, Comparator {
         else this.circle.setFill(Color.LIGHTBLUE);
     }
 
-    public void moveLeft() {
+    public void moveLeft(int gear) {
         if (!active) return;
-        /*if (g.getLayoutX() > 1)*/ {
+        if (gear>=2) {
+            double y = g.getLayoutX() - step-step/2;
+            g.setLayoutX(y);
+        } else {
             double y = g.getLayoutX() - step;
             g.setLayoutX(y);
         }
     }
 
-    public void moveUp() {
+    public void moveUp(int gear) {
         if (!active) return;
-        /*if (g.getLayoutY() > 1)*/ {
+        if (gear>=2) {
+            double y = g.getLayoutY() - step-step/2;
+            g.setLayoutY(y);
+        }else {
             double y = g.getLayoutY() - step;
             g.setLayoutY(y);
         }
+
     }
 
-    public void moveRight() {
+    public void moveRight(int gear) {
         if (!active) return;
-        /*if (g.getLayoutX() < 1480)*/ {
-            double x = g.getLayoutX() + step;
+        if(gear >= 2) {
+            double x = g.getLayoutX() + step+step/2;
             g.setLayoutX(x);
+        }
+        else {
+            double y = g.getLayoutX() + step;
+            g.setLayoutX(y);
         }
     }
 
-    public void moveDown() {
+    public void moveDown(int gear) {
         if (!active) return;
-        /*if (g.getLayoutY() < 690)*/ {
+        if (gear >=2) {
+            double y = g.getLayoutY() + step+step/2;
+            g.setLayoutY(y);
+        }
+        else{
             double y = g.getLayoutY() + step;
             g.setLayoutY(y);
         }
@@ -423,6 +450,7 @@ public class Spider implements Cloneable, Comparable<Spider>, Comparator {
             Spider sp = Main.uni.get(i);
             if (Integer.parseInt(sp.getHealthPoint()) <= 0) {
                 Main.group.getChildren().remove(sp.g);
+                logger.log(i + " died ");
                 Main.uni.remove(i);
             }
 
@@ -452,14 +480,14 @@ public class Spider implements Cloneable, Comparable<Spider>, Comparator {
 ///------------------------------------------------------------NorthEAsternTower
             if (spider.getGroup(spider).getBoundsInParent().intersects(Main.northEasternTower.towerGroup.getBoundsInParent())) {
                 if (Main.northEasternTower.getState() == Tower.State.NEUTRAL) {
-                    if (spider.getSide().equals("true")&& !spider.isSafe&& spider.healthPoint<50) {
+                    if (spider.getSide().equals("true")&& !spider.isSafe) {
                         if (spider.active) {
                             spider.setActive(false);
                         }
                         spider.setHealthPoint(Integer.parseInt(spider.getHealthPoint()) + 20);
-                        spider.setSafe(true);
+                        /*spider.setSafe(true);
                         spider.g.setVisible(false);
-                        Main.northernTowerList.add(spider);
+                        Main.northernTowerList.add(spider);*/
                         Main.northEasternTower.setState(Tower.State.RADIANT);
                         Main.northEasternTower.towerPaint();
                     } else {
@@ -496,13 +524,13 @@ public class Spider implements Cloneable, Comparable<Spider>, Comparator {
 ///----------------------------------------------------------------------------SouthWestern Tower
             if (spider.getGroup(spider).getBoundsInParent().intersects(Main.southWesternTower.towerGroup.getBoundsInParent())) {
                 if (Main.southWesternTower.getState() == Tower.State.NEUTRAL) {
-                    if (spider.getSide().equals("true")&& !spider.isSafe&& spider.healthPoint<50) {
+                    if (spider.getSide().equals("true")&& !spider.isSafe) {
                         Main.southWesternTower.setState(Tower.State.RADIANT);
                         Main.southWesternTower.towerPaint();
-                        spider.setSafe(true);
-                        spider.g.setVisible(false);
+                       /* spider.setSafe(true);
+                        spider.g.setVisible(false);*/
                         spider.setHealthPoint(Integer.parseInt(spider.getHealthPoint()) + 20);
-                        Main.southernTowerList.add(spider);
+                        /*Main.southernTowerList.add(spider);*/
                     } else {
                         Main.southWesternTower.setState(Tower.State.DIRE);
                         Main.southWesternTower.towerPaint();
@@ -535,15 +563,16 @@ public class Spider implements Cloneable, Comparable<Spider>, Comparator {
                     }
                 }
             }
+            //// middle
             if (spider.getGroup(spider).getBoundsInParent().intersects(Main.middleEarthTower.towerGroup.getBoundsInParent())) {
                 if (Main.middleEarthTower.getState() == Tower.State.NEUTRAL) {
-                    if (spider.getSide().equals("true")&& !spider.isSafe&& spider.healthPoint<50) {
+                    if (spider.getSide().equals("true")&& !spider.isSafe) {
                         Main.middleEarthTower.setState(Tower.State.RADIANT);
                         Main.middleEarthTower.towerPaint();
-                        Main.middleTowerList.add(spider);
-                        spider.g.setVisible(false);
+                        /*Main.middleTowerList.add(spider);*/
+                        /*spider.g.setVisible(false);*/
                         spider.setHealthPoint(Integer.parseInt(spider.getHealthPoint()) + 20);
-                        spider.setSafe(true);
+                        /*spider.setSafe(true);*/
                     } else {
                         Main.middleEarthTower.setState(Tower.State.DIRE);
                         Main.middleEarthTower.towerPaint();
@@ -593,6 +622,12 @@ public class Spider implements Cloneable, Comparable<Spider>, Comparator {
             }
         }
     }
+public double getDamageAsDouble (){
+        return this.damage;
+}
+public int getSurvived() {
+        return this.counter.getSecondsSurvived()/60;
+}
 
 
     public void spawnBack(Spider s) {
@@ -610,9 +645,10 @@ public class Spider implements Cloneable, Comparable<Spider>, Comparator {
     public String toString() {
         return "Spider{" + "name=" + name.getText() +
                 ", damage=" + damage + ", health=" + healthPoint + ", side="
-                + side + ", x=" + getPosX() + ", y=" + getPosY() + ", suggested names" +
-                suggestedNames.toString() + ", active=" + active +", safe+"+ isSafe+'}';
+                + side + ", x=" + getPosX() + ", y=" + getPosY() + ", survived seconds " +
+                getSurvived() + ", active=" + active +", safe+"+ isSafe+'}';
     }
+
 
     @Override
     public int compare(Object o1, Object o2) {
@@ -628,9 +664,16 @@ public class Spider implements Cloneable, Comparable<Spider>, Comparator {
 
     @Override
     public int compareTo(@NotNull Spider o) {
-        return 0;
+        return nameS.compareTo(o.getName());
+    }
+
+
+    @Override
+    public void predictTheWin() {
+        System.out.println(name.getText()+" predicts his team will win");
     }
 }
+
 
 
 
