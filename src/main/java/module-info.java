@@ -6,6 +6,6 @@ module com.example.xixixi {
     requires annotations;
     requires javafx.graphics;
 
-    opens com.example.xixixi to javafx.fxml;
-    exports com.example.xixixi;
+    opens com.example.POEgame to javafx.fxml;
+    exports com.example.POEgame;
 }

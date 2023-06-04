@@ -1,4 +1,4 @@
-package com.example.xixixi;
+package com.example.POEgame;
 
 
 import javafx.scene.Group;
@@ -21,7 +21,7 @@ public class Background {
     Background() throws FileNotFoundException {
         img = new Image(Main.class.getResource("background.jpg").toString(),4060,2900,false,false);
         ImageView imageView = new ImageView(img);
-        imageView.setFitWidth(2600);
+        imageView.setFitWidth(3060);
         imageView.setFitHeight(2000);
         this.iv = imageView;
 

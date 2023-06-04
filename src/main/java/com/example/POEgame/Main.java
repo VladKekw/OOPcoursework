@@ -1,4 +1,4 @@
-package com.example.xixixi;
+package com.example.POEgame;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
@@ -6,8 +6,12 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.control.*;
+import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
@@ -16,15 +20,17 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.transform.Scale;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Random;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 // Пункти 4,5,6,8,,11,12 було додано в ЛР №2
@@ -36,6 +42,18 @@ public class Main extends Application {
     public static String[] bodya = {"Bodya", "Boss", "vsih", "pavukiv"};
 
     Logger logger = new Logger("D:\\buildings.txt");
+
+    public static boolean firsttime = true;
+    static LocalDateTime beginTime = LocalDateTime.now();
+    static int frames = 0;
+    static Label label = new Label();
+    public static double minimapScale = 0.1;
+    public Label statusLabel = new Label();
+
+    public static Rectangle minimapBorderRect;
+    public static Rectangle activeAreaRect;
+    public static ImageView imageviewmap;
+
 
     public static Background bg;
     static Random random = new Random();
@@ -55,7 +73,7 @@ public class Main extends Application {
     public static ArrayList<Spider> southernTowerList = new ArrayList<>();
     public static ArrayList<Spider> middleTowerList = new ArrayList<>();
 
-    public static final String[] NAMES = {"DarienGray", "Anufrij", "Freddy"
+    public static final String[] NAMES = {"Darien", "Anufrij", "Freddy"
             , "Purdie", "Wilton", "Godfrey",
             "Roswell", "Chelsey", "Adrian", "Bernie"};
 
@@ -105,6 +123,7 @@ public class Main extends Application {
         }
         return null;
     }
+
     public static ArrayList<String> getSpiderNames() {
         ArrayList<String> spiderNames = new ArrayList<>();
 
@@ -124,6 +143,7 @@ public class Main extends Application {
 
         return golemNames;
     }
+
     public static ArrayList<String> getElemNames() {
         ArrayList<String> elemNames = new ArrayList<>();
 
@@ -133,8 +153,8 @@ public class Main extends Application {
         return elemNames;
     }
 
-    public static ArrayList<String> SpiderGetParamsToChange(int index) {
-        Spider s = web.get(index - 1);
+    public static ArrayList<String> UnitGetParamsToChange(int index) {
+        Spider s = uni.get(index - 1);
         ArrayList<String> array = new ArrayList<>();
         array.add(s.getName());
         array.add(s.getHealthPoint());
@@ -145,44 +165,17 @@ public class Main extends Application {
         return array;
     }
 
-    public static ArrayList<String> GolemGetParamsToChange2(int index) {
-        Golem g = cave.get(index - 1);
-
-        ArrayList<String> array = new ArrayList<>();
-        array.add(g.getName());
-        array.add(g.getHealthPoint());
-        array.add(g.getDamage());
-        array.add(g.getSide());
-        array.add(g.getX());
-        array.add(g.getY());
-        return array;
-    }
-
-    public static ArrayList<String> IceElementalGetParamsToChange3(int index) {
-        IceElemental ice = river.get(index - 1);
-
-        ArrayList<String> array = new ArrayList<>();
-        array.add(ice.getName());
-        array.add(ice.getHealthPoint());
-        array.add(ice.getDamage());
-        array.add(ice.getSide());
-        array.add(ice.getX());
-        array.add(ice.getY());
-        return array;
-    }
-
-
     public void SpawnBackground() throws FileNotFoundException {
         bg = new Background();
         group.getChildren().add(bg.getBackGrp());
     }
 
 
-
     public void lifeCycle() {
         Spider.interCheck();
         Spider.cleanupCorpses();
         for (Spider s : uni) {
+
             s.getCounter().updateSeconds();
             s.updateSecondsText(s.getCounter());
         }
@@ -191,14 +184,14 @@ public class Main extends Application {
         if (northEasternTower.getState() == Tower.State.DIRE && southWesternTower.getState() == Tower.State.DIRE
                 && middleEarthTower.getState() == Tower.State.DIRE) {
             alert.setContentText("The Dire have won!");
-            Platform.runLater(alert :: showAndWait);
+            Platform.runLater(alert::showAndWait);
             alert.setOnCloseRequest(e -> Platform.exit());
 
         }
         if (northEasternTower.getState() == Tower.State.RADIANT && southWesternTower.getState() == Tower.State.RADIANT
                 && middleEarthTower.getState() == Tower.State.RADIANT) {
             alert.setContentText("Radiant have won!");
-            Platform.runLater(alert :: showAndWait);
+            Platform.runLater(alert::showAndWait);
             alert.setOnCloseRequest(e -> Platform.exit());
         }
 
@@ -228,7 +221,7 @@ public class Main extends Application {
         try {
             x = Double.parseDouble(sX);
             if (x == 0.0) {
-                x = random.nextDouble(2600);
+                x = random.nextDouble(2000);
             }
         } catch (Exception e) {
             x = 5.0;
@@ -237,13 +230,13 @@ public class Main extends Application {
         try {
             y = Double.parseDouble(sY);
             if (y == 0.0) {
-                y = random.nextDouble(2000);
+                y = random.nextDouble(1400);
             }
         } catch (Exception e) {
             y = 5.0;
         }
         Spider spider = new Spider(h, d, sName, sSide, x, y, sP);
-        Main.web.add(spider);
+
         Main.uni.add(spider);
     }
 
@@ -263,14 +256,14 @@ public class Main extends Application {
         try {
             d = Double.parseDouble(sDamage);
         } catch (Exception e) {
-            d = 100.0;
+            d = 50.0;
         }
 
         double x;
         try {
             x = Double.parseDouble(sX);
             if (x == 0.0) {
-                x = random.nextDouble(2600);
+                x = random.nextDouble(2000);
             }
         } catch (Exception e) {
             x = 0.0;
@@ -279,13 +272,12 @@ public class Main extends Application {
         try {
             y = Double.parseDouble(sY);
             if (y == 0.0) {
-                y = random.nextDouble(2000);
+                y = random.nextDouble(1400);
             }
         } catch (Exception e) {
             y = 0.0;
         }
         Golem golem = new Golem(h, d, sName, sSide, x, y, sP);
-        Main.cave.add(golem);
         Main.uni.add(golem);
 
     }
@@ -295,41 +287,18 @@ public class Main extends Application {
             if (s.isActive()) {
                 Rectangle rect = findClonePosition(Double.parseDouble(s.getX()), Double.parseDouble(s.getY()), 75, 75);
                 if (rect != null) {
-
-
-                    if (s instanceof Spider) {
-                        if (s instanceof Golem) {
-                            if (s instanceof IceElemental) {
-                                try {
-                                    s.cloneElem();
-
-                                } catch (CloneNotSupportedException e) {
-                                    throw new RuntimeException(e);
-                                }
-                                break;
-                            }
-                            try {
-                                s.cloneGolem();
-
-                            } catch (CloneNotSupportedException e) {
-                                throw new RuntimeException(e);
-                            }
-                            break;
-                        }
-                        try {
-                            s.clone();
-
-                        } catch (CloneNotSupportedException e) {
-                            throw new RuntimeException(e);
-                        }
-                        s.setY(Double.toString(rect.getY()));
-                        s.setX(Double.toString(rect.getX()));
+                    try {
+                        s.clone();
+                    } catch (CloneNotSupportedException e) {
+                        throw new RuntimeException(e);
                     }
-
+                    s.setY(Double.toString(rect.getY()));
+                    s.setX(Double.toString(rect.getX()));
                 }
             }
         }
     }
+
 
     public static void createNewIceElemental(String sName, String sDamage, String sHealth, String sSide, String sX, String sY, String[] sP) {
 
@@ -347,14 +316,14 @@ public class Main extends Application {
         try {
             d = Double.parseDouble(sDamage);
         } catch (Exception e) {
-            d = 100.0;
+            d = 50.0;
         }
 
         double x;
         try {
             x = Double.parseDouble(sX);
             if (x == 0.0) {
-                x = random.nextDouble(2600);
+                x = random.nextDouble(2000);
             }
         } catch (Exception e) {
             x = 0.0;
@@ -363,13 +332,12 @@ public class Main extends Application {
         try {
             y = Double.parseDouble(sY);
             if (y == 0.0) {
-                y = random.nextDouble(2000);
+                y = random.nextDouble(1400);
             }
         } catch (Exception e) {
             y = 0.0;
         }
         IceElemental ice = new IceElemental(h, d, sName, sSide, x, y, sP);
-        Main.river.add(ice);
         Main.uni.add(ice);
     }
 
@@ -699,21 +667,39 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        SpawnBackground();
 
+        MenuBar menuBar = new MenuBar();
+        Menu file = new Menu("file");
+        Menu info = new Menu("info");
+        Menu help = new Menu("help");
+        Menu text = new Menu("was activated ", statusLabel);
+        MenuItem save = new MenuItem("save");
+        MenuItem open = new MenuItem("open");
+        MenuItem showinfo = new MenuItem("show info");
+        file.getItems().addAll(save, open);
+        info.getItems().add(showinfo);
+
+        menuBar.getMenus().addAll(file, help, info, text);
+        statusLabel.setLayoutX(10);
+        statusLabel.setLayoutY(1990);
+        statusLabel.setText("");
+        statusLabel.setFont(new Font(15));
+        SpawnBackground();
         ScrollPane scrollPane = new ScrollPane(group);
+        scrollPane.setPannable(true);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setMaxHeight(Background.border.getHeight());
         scrollPane.setMaxWidth(Background.border.getWidth());
         scrollPane.setFitToHeight(true);
         scrollPane.setFitToWidth(true);
-        BorderPane layout = new BorderPane();
-        layout.setCenter(scrollPane);
+        BorderPane layout = new BorderPane(scrollPane);
+        layout.setTop(menuBar);
 
 
         direBase = new DireBase(Background.border.getWidth() - 700, 1510);
         logger.log("An ancient building was here since the dawn of the world...");
         group.getChildren().add(direBase.direBaseGroup);
-
         radBase = new RadBase(550, 310);
         logger.log("The world has never seen a castle that beautiful...");
         group.getChildren().add(radBase.RadiantBaseGroup);
@@ -725,14 +711,21 @@ public class Main extends Application {
         middleEarthTower = new Tower(1130, 800, "MiddleEarth Tower", middleTowerList);
         logger.log("MiddleEarth tower was created on x=1130, y=800");
         group.getChildren().addAll(northEasternTower.towerGroup, southWesternTower.towerGroup, middleEarthTower.towerGroup);
-
-        Scene scene = new Scene(layout, 1532, 800);
+        BorderPane minimapGroup = new BorderPane(layout);
+        minimapGroup.getChildren().add(label);
+        label.setLayoutX(280);
+        label.setLayoutY(256);
+        /*layout.getChildren().add(minimapGroup);*/
+        Scene scene = new Scene(minimapGroup, 1532, 800);
         scene.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
+                if(!mouseEvent.getButton().equals(MouseButton.PRIMARY))
+                {
+                    statusLabel.setText("");
+                }
                 if (mouseEvent.getButton().equals(MouseButton.SECONDARY)) {
                     ChooseUnit.choose();
-
                     for (int i = web.size() - 1; i >= 0; --i) {
                         Spider spider = web.get(i);
                         if (spider.isActive()) {
@@ -740,8 +733,22 @@ public class Main extends Application {
                             web.remove(i);
                             spider.getGroup(spider).setVisible(false);
                         }
+                    }
+                }
+                if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
+                    for (Spider s : uni) {
+                        if (s.getActive()) {
+                            statusLabel.setText(s.toString());
+                        }
 
                     }
+                }
+
+                if (minimapBorderRect.contains(mouseEvent.getX(), mouseEvent.getY())) {
+                    double virtualX = (mouseEvent.getX()) / 456;
+                    double virtualY = (mouseEvent.getY() - 550) / 256;
+                    scrollPane.setVvalue(virtualY);
+                    scrollPane.setHvalue(virtualX);
                 }
             }
         });
@@ -749,6 +756,61 @@ public class Main extends Application {
             @Override
             public void handle(long now) {
                 lifeCycle();
+                LocalDateTime nextTime = LocalDateTime.now();
+                if (ChronoUnit.SECONDS.between(beginTime, nextTime) > 0) {
+                    label.setText(Integer.toString(frames));
+                    frames = 0;
+                    beginTime = nextTime;
+                    if (imageviewmap != null) {
+                        minimapGroup.getChildren().remove(imageviewmap);
+                        minimapGroup.getChildren().remove(activeAreaRect);
+                    } else {
+                        if (firsttime) {
+                            firsttime = false;
+                            minimapBorderRect = new Rectangle(4500 * Main.minimapScale + 6.0, 2500 * Main.minimapScale + 6.0);
+                            minimapBorderRect.setFill(Color.TRANSPARENT);
+                            minimapBorderRect.setStrokeWidth(3);
+                            minimapBorderRect.setStroke(Color.DARKRED);
+                            minimapBorderRect.setX(0);
+                            minimapBorderRect.setY(550);
+                            minimapGroup.getChildren().add(minimapBorderRect);
+                        }
+                    }
+                    final WritableImage SNAPSHOT = group.snapshot(new SnapshotParameters(), null);
+                    imageviewmap = new ImageView(SNAPSHOT);
+                    imageviewmap.setFitHeight(2500 * Main.minimapScale + 6.0);
+                    imageviewmap.setX(0);
+                    imageviewmap.setY(550);
+                    imageviewmap.setFitWidth(4500 * Main.minimapScale + 6.0);
+                    minimapGroup.getChildren().add(imageviewmap);
+                    Scale scale = new Scale();
+
+                    //Setting the dimensions for the transformation
+                    scale.setX(Main.minimapScale);
+                    scale.setY(Main.minimapScale);
+
+                    double xlocation = scrollPane.getHvalue();
+                    double ylocation = scrollPane.getVvalue();
+                    activeAreaRect = new Rectangle((stage.getWidth() + 705) * minimapScale, (stage.getHeight() + 180) * minimapScale);
+                    Group activeRectGroup = new Group();
+                    activeRectGroup.getChildren().add(activeAreaRect);
+                    activeAreaRect.setFill(Color.TRANSPARENT);
+                    activeAreaRect.setStrokeWidth(2);
+                    activeAreaRect.setStroke(Color.GREEN);
+                    if (xlocation > 0.77) {
+                        activeAreaRect.setX(0 + 230);
+                    } else {
+                        activeAreaRect.setX(0 + (xlocation * 3060) * minimapScale);
+                    }
+                    if (ylocation > 0.83) {
+                        activeAreaRect.setY(550 + 154);
+                    } else {
+                        activeAreaRect.setLayoutY(550 + (ylocation * 2000) * minimapScale);
+
+                    }
+                    minimapGroup.getChildren().add(activeAreaRect);
+                } else frames++;
+
             }
         };
 
@@ -771,6 +833,7 @@ public class Main extends Application {
                     for (Spider spider : uni) {
                         if (spider.isActive()) {
                             spider.switchActivation();
+                            statusLabel.setText("");
                         }
                     }
                 }
@@ -871,5 +934,6 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         launch();
+
     }
 }

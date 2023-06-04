@@ -1,4 +1,4 @@
-package com.example.xixixi;
+package com.example.POEgame;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;

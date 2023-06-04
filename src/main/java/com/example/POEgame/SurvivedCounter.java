@@ -1,4 +1,4 @@
-package com.example.xixixi;
+package com.example.POEgame;
 
 public class SurvivedCounter implements Cloneable {
     private int secondsSurvived = 1;

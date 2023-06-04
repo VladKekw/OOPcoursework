@@ -1,4 +1,4 @@
-package com.example.xixixi;
+package com.example.POEgame;
 
 
 import javafx.event.ActionEvent;
@@ -35,7 +35,7 @@ public class ChangeUnitParams {
         ArrayList<String>  GolemParamsToChange= new ArrayList<>();
         ArrayList<String> IceElementalParamsToChange = new ArrayList<>();
         if(s.equals("spider")){
-            SpiderParamsToChange = Main.SpiderGetParamsToChange( index);
+            SpiderParamsToChange = Main.UnitGetParamsToChange( index);
             Label nameLabel=new Label();
             nameLabel.setText("Name:");
             TextField nameText = new TextField();
@@ -102,7 +102,7 @@ public class ChangeUnitParams {
                     rad,dire, okButton);
         }
         if(s.equals("golem")){
-            GolemParamsToChange = Main.GolemGetParamsToChange2(index) ;
+            GolemParamsToChange = Main.UnitGetParamsToChange(index) ;
             Label nameLabel=new Label();
             nameLabel.setText("Name:");
             TextField nameText = new TextField();
@@ -169,7 +169,7 @@ public class ChangeUnitParams {
                     rad,dire, okButton);
         }
         if(s.equals("iceElemental")){
-            IceElementalParamsToChange = Main.IceElementalGetParamsToChange3( index);
+            IceElementalParamsToChange = Main.UnitGetParamsToChange( index);
             Label nameLabel=new Label();
             nameLabel.setText("Name:");
             TextField nameText = new TextField();

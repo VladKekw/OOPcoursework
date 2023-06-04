@@ -1,4 +1,4 @@
-package com.example.xixixi;
+package com.example.POEgame;
 
 import java.io.FileWriter;
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package com.example.xixixi;
+package com.example.POEgame;
 
 import javafx.event.EventHandler;
 import javafx.scene.image.Image;
@@ -16,7 +16,9 @@ public class IceElemental extends Golem{
         SurvivedCounter counter = new SurvivedCounter();
         imageView.setX(x-3);
         imageView.setY(y+15);
-        init(counter,posX,posY);
+
+
+        init(counter,posX,posY,true);
         System.out.println("an ice elemental has been created");
 
         this.g.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -35,7 +37,12 @@ public class IceElemental extends Golem{
         ImageView elemImgView = new ImageView(i);
         SurvivedCounter counter = new SurvivedCounter();
         this.g.relocate(20,20);
-        init(counter,0,0);
+        init(counter,0,0,true);
+    }
+    @Override
+    public void receiveDamageFromObjects(Spider target) {
+        target.setHealthPoint((Integer.parseInt(target.getHealthPoint())) - 3);
+
     }
 
     @Override
