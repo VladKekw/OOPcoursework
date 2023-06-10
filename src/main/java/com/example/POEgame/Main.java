@@ -24,14 +24,19 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.transform.Scale;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 // Пункти 4,5,6,8,,11,12 було додано в ЛР №2
 // deep clone, comparator, console , stream api nested class, etc
@@ -40,12 +45,17 @@ import java.util.stream.Collectors;
 
 public class Main extends Application {
     public static String[] bodya = {"Bodya", "Boss", "vsih", "pavukiv"};
+    public  File logfile = new File("save.txt");
 
-    Logger logger = new Logger("D:\\buildings.txt");
+    Logger logger = new Logger(logfile.getPath());
 
     public static boolean firsttime = true;
     static LocalDateTime beginTime = LocalDateTime.now();
     static int frames = 0;
+    public boolean shown = false;
+    public boolean opened = false;
+
+
     static Label label = new Label();
     public static double minimapScale = 0.1;
     public Label statusLabel = new Label();
@@ -66,9 +76,6 @@ public class Main extends Application {
 
     public static AnchorPane group = new AnchorPane();
     public static List<Spider> uni = new CopyOnWriteArrayList<>();
-    public static ArrayList<Spider> web = new ArrayList<>();
-    public static ArrayList<Golem> cave = new ArrayList<>();
-    public static ArrayList<IceElemental> river = new ArrayList<>();
     public static ArrayList<Spider> northernTowerList = new ArrayList<>();
     public static ArrayList<Spider> southernTowerList = new ArrayList<>();
     public static ArrayList<Spider> middleTowerList = new ArrayList<>();
@@ -114,43 +121,14 @@ public class Main extends Application {
                     }
                 }
                 if (!found) {
-                    r.setX(newx - 1532);
-                    r.setY(newy - 800);
+                    r.setX(newx);
+                    r.setY(newy);
                     return r;
 
                 }
             }
         }
         return null;
-    }
-
-    public static ArrayList<String> getSpiderNames() {
-        ArrayList<String> spiderNames = new ArrayList<>();
-
-        for (Spider s : web) {
-            spiderNames.add(s.toString());
-        }
-
-        return spiderNames;
-    }
-
-    public static ArrayList<String> getGolemNames() {
-        ArrayList<String> golemNames = new ArrayList<>();
-
-        for (Golem g : cave) {
-            golemNames.add(g.toString());
-        }
-
-        return golemNames;
-    }
-
-    public static ArrayList<String> getElemNames() {
-        ArrayList<String> elemNames = new ArrayList<>();
-
-        for (IceElemental i : river) {
-            elemNames.add(i.toString());
-        }
-        return elemNames;
     }
 
     public static ArrayList<String> UnitGetParamsToChange(int index) {
@@ -171,40 +149,63 @@ public class Main extends Application {
     }
 
 
+
     public void lifeCycle() {
+
+        Spider.towerCheck();
         Spider.interCheck();
         Spider.cleanupCorpses();
+        /*Main.uni.get(0).updatePosition();*/
         for (Spider s : uni) {
-
+            s.updatePosition();
+            s.autoMove();
+            s.moveToBase();
             s.getCounter().updateSeconds();
             s.updateSecondsText(s.getCounter());
         }
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Congratulations!");
+        if(uni.size()==0 && !shown && !opened)
+        {
+            shown=true;
+            alert.setContentText("noone survived...");
+            Platform.runLater(alert::showAndWait);
+            alert.setOnCloseRequest(e -> Platform.exit());
+        }
         if (northEasternTower.getState() == Tower.State.DIRE && southWesternTower.getState() == Tower.State.DIRE
-                && middleEarthTower.getState() == Tower.State.DIRE) {
-            alert.setContentText("The Dire have won!");
+                && middleEarthTower.getState() == Tower.State.DIRE && !shown) {
+            shown=true;
+            alert.setContentText("The Dire have won!" );
             Platform.runLater(alert::showAndWait);
             alert.setOnCloseRequest(e -> Platform.exit());
 
         }
+        List<Spider> counted = uni.stream().filter(spider -> spider.getSide() == "false").collect(Collectors.toList());
+        int countdire = counted.size();
+        List<Spider> countedd = uni.stream().filter(spider -> spider.getSide() == "true").collect(Collectors.toList());
+        int countrad = countedd.size();
+     /*   if (countrad - countdire >2) {
+            alert.setContentText("The Radiant have won!");
+            Platform.runLater(alert::showAndWait);
+            alert.setOnCloseRequest(e -> Platform.exit());
+        }
+        if (countdire-countrad>2) {
+            alert.setContentText("Dire have won!");
+            Platform.runLater(alert::showAndWait);
+            alert.setOnCloseRequest(e -> Platform.exit());
+        }*/
         if (northEasternTower.getState() == Tower.State.RADIANT && southWesternTower.getState() == Tower.State.RADIANT
-                && middleEarthTower.getState() == Tower.State.RADIANT) {
+                && middleEarthTower.getState() == Tower.State.RADIANT && !shown) {
+            shown=true;
             alert.setContentText("Radiant have won!");
             Platform.runLater(alert::showAndWait);
             alert.setOnCloseRequest(e -> Platform.exit());
         }
-
-
     }
 
-
     public static void createNewSpider(String sName, String sDamage, String sHealth, String sSide, String sX, String sY, String[] sP) {
-
         System.out.printf("sName=%s sHealth=%s sDamage=%s sSide = %S sX=%s sY=%s \n", sName, sHealth, sDamage, sSide, sX, sY);
-
         if (sName.equals("")) sName = "Spider";
-
         int h;
         try {
             h = Integer.parseInt(sHealth);
@@ -236,9 +237,130 @@ public class Main extends Application {
             y = 5.0;
         }
         Spider spider = new Spider(h, d, sName, sSide, x, y, sP);
-
         Main.uni.add(spider);
     }
+
+    public static void createNewSpider(String sName, String sDamage, String sHealth, String sSide, String sX, String sY, String[] sP, String sAct, double count) {
+
+        System.out.printf("sName=%s sHealth=%s sDamage=%s sSide = %S sX=%s sY=%s \n", sName, sHealth, sDamage, sSide, sX, sY);
+        if (sName.equals("")) sName = "Spider";
+        int h;
+        try {
+            h = Integer.parseInt(sHealth);
+        } catch (Exception e) {
+            h = 100;
+        }
+        double d;
+        try {
+            d = Double.parseDouble(sDamage);
+        } catch (Exception e) {
+            d = 50.0;
+        }
+        double x;
+        try {
+            x = Double.parseDouble(sX);
+            if (x == 0.0) {
+                x = random.nextDouble(2000);
+            }
+        } catch (Exception e) {
+            x = 5.0;
+        }
+        double y;
+        try {
+            y = Double.parseDouble(sY);
+            if (y == 0.0) {
+                y = random.nextDouble(1400);
+            }
+        } catch (Exception e) {
+            y = 5.0;
+        }
+        boolean act = Boolean.parseBoolean(sAct);
+
+        Spider spider = new Spider(h, d, sName, sSide, x, y, sP, act, count);
+        Main.uni.add(spider);
+
+    }
+
+    public static void createNewGolem(String sName, String sDamage, String sHealth, String sSide, String sX, String sY, String[] sP, String sAct, double count) {
+
+        System.out.printf("sName=%s sHealth=%s sDamage=%s sSide = %S sX=%s sY=%s \n", sName, sHealth, sDamage, sSide, sX, sY);
+        if (sName.equals("")) sName = "Spider";
+        int h;
+        try {
+            h = Integer.parseInt(sHealth);
+        } catch (Exception e) {
+            h = 100;
+        }
+        double d;
+        try {
+            d = Double.parseDouble(sDamage);
+        } catch (Exception e) {
+            d = 50.0;
+        }
+        double x;
+        try {
+            x = Double.parseDouble(sX);
+            if (x == 0.0) {
+                x = random.nextDouble(2000);
+            }
+        } catch (Exception e) {
+            x = 5.0;
+        }
+        double y;
+        try {
+            y = Double.parseDouble(sY);
+            if (y == 0.0) {
+                y = random.nextDouble(1400);
+            }
+        } catch (Exception e) {
+            y = 5.0;
+        }
+        boolean act = Boolean.parseBoolean(sAct);
+        Golem golem = new Golem(h, d, sName, sSide, x, y, sP, act, count);
+        Main.uni.add(golem);
+
+    }
+
+    public static void createNewIceElemental(String sName, String sDamage, String sHealth, String sSide, String sX, String sY, String[] sP, String sAct, double count) {
+
+        System.out.printf("sName=%s sHealth=%s sDamage=%s sSide = %S sX=%s sY=%s \n", sName, sHealth, sDamage, sSide, sX, sY);
+        if (sName.equals("")) sName = "Spider";
+        int h;
+        try {
+            h = Integer.parseInt(sHealth);
+        } catch (Exception e) {
+            h = 100;
+        }
+        double d;
+        try {
+            d = Double.parseDouble(sDamage);
+        } catch (Exception e) {
+            d = 50.0;
+        }
+        double x;
+        try {
+            x = Double.parseDouble(sX);
+            if (x == 0.0) {
+                x = random.nextDouble(2000);
+            }
+        } catch (Exception e) {
+            x = 5.0;
+        }
+        double y;
+        try {
+            y = Double.parseDouble(sY);
+            if (y == 0.0) {
+                y = random.nextDouble(1400);
+            }
+        } catch (Exception e) {
+            y = 5.0;
+        }
+        boolean act = Boolean.parseBoolean(sAct);
+        IceElemental iceElemental = new IceElemental(h, d, sName, sSide, x, y, sP, act, 56.0);
+        Main.uni.add(iceElemental);
+
+    }
+
 
     public static void createNewGolem(String sName, String sDamage, String sHealth, String sSide, String sX, String sY, String[] sP) {
 
@@ -292,8 +414,10 @@ public class Main extends Application {
                     } catch (CloneNotSupportedException e) {
                         throw new RuntimeException(e);
                     }
+/*
                     s.setY(Double.toString(rect.getY()));
-                    s.setX(Double.toString(rect.getX()));
+*/
+                    s.setX(Double.toString(30));
                 }
             }
         }
@@ -672,7 +796,7 @@ public class Main extends Application {
         Menu file = new Menu("file");
         Menu info = new Menu("info");
         Menu help = new Menu("help");
-        Menu text = new Menu("was activated ", statusLabel);
+        Menu text = new Menu("",statusLabel);
         MenuItem save = new MenuItem("save");
         MenuItem open = new MenuItem("open");
         MenuItem showinfo = new MenuItem("show info");
@@ -720,17 +844,16 @@ public class Main extends Application {
         scene.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
-                if(!mouseEvent.getButton().equals(MouseButton.PRIMARY))
-                {
+                if (!mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
                     statusLabel.setText("");
                 }
                 if (mouseEvent.getButton().equals(MouseButton.SECONDARY)) {
                     ChooseUnit.choose();
-                    for (int i = web.size() - 1; i >= 0; --i) {
-                        Spider spider = web.get(i);
+                    for (int i = uni.size() - 1; i >= 0; --i) {
+                        Spider spider = uni.get(i);
                         if (spider.isActive()) {
                             group.getChildren().remove(spider);
-                            web.remove(i);
+                            uni.remove(i);
                             spider.getGroup(spider).setVisible(false);
                         }
                     }
@@ -738,6 +861,12 @@ public class Main extends Application {
                 if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
                     for (Spider s : uni) {
                         if (s.getActive()) {
+                            if(uni.stream().filter(spider ->spider.isActive()).collect(Collectors.toList()).size()>1)
+                            {
+                                statusLabel.setText("");
+                                statusLabel.setText("multiple objects are active");
+                            }
+                            else
                             statusLabel.setText(s.toString());
                         }
 
@@ -813,6 +942,92 @@ public class Main extends Application {
 
             }
         };
+        info.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                drawInfo();
+            }
+        });
+        save.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                String currentDir = System.getProperty("user.dir");
+
+                File initDirectory = new File(currentDir);
+
+                FileChooser fileChooser = new FileChooser();
+
+                FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt");
+                fileChooser.getExtensionFilters().add(extFilter);
+                fileChooser.setInitialDirectory(initDirectory);
+                //Show save file dialog
+                File file = fileChooser.showSaveDialog(stage);
+                try {
+                    FileWriter fileWriter = null;
+                    fileWriter = new FileWriter(file);
+                    fileWriter.write(Integer.toString(uni.size()));
+                    fileWriter.write('\n');
+                    for (Spider s : uni) {
+                        s.Save(fileWriter);
+                    }
+                    fileWriter.close();
+                } catch (IOException ex) {
+                    java.util.logging.Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+
+
+        open.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                /*deserialize();*/
+                String currentDir = System.getProperty("user.dir");
+                File initDirectory = new File(currentDir);
+                FileChooser fileChooser = new FileChooser();
+                FileChooser.ExtensionFilter extFilter =
+                        new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt");
+                fileChooser.getExtensionFilters().add(extFilter);
+                fileChooser.setInitialDirectory(
+                        initDirectory);
+                File file = fileChooser.showOpenDialog(stage);
+                BufferedReader bufferedReader = null;
+
+                if (file != null) {
+                    try {
+                        opened = true;
+                        bufferedReader = new BufferedReader(new FileReader(file));
+                        String text;
+                        text = bufferedReader.readLine();
+                        int arrsize = Integer.parseInt(text);
+                        for (Spider s : uni) {
+
+                            uni.remove(s);
+                            Main.group.getChildren().remove(s.getGroupP());
+                        }
+                        for (int i = 0; i < arrsize; i++) {
+                            Spider sp = new Spider();
+                            Main.group.getChildren().remove(sp.getGroupP());
+                            sp.Open(bufferedReader);
+                        }
+
+
+
+                    } catch (FileNotFoundException ex) {
+                        java.util.logging.Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (IOException ex) {
+                        java.util.logging.Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                    } finally {
+                        try {
+                            bufferedReader.close();
+                        } catch (IOException ex) {
+                            java.util.logging.Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                }
+            }
+
+        });
 
         scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
@@ -875,7 +1090,6 @@ public class Main extends Application {
                     }
                 }
                 if (keyEvent.getCode() == KeyCode.A) {
-
                     for (Spider spider : uni) {
                         if (spider.isActive()) {
                             spider.moveLeft(1);
@@ -883,8 +1097,14 @@ public class Main extends Application {
                         }
                     }
                 }
+                if (keyEvent.getCode() == KeyCode.T) {
+                    for (Spider s : uni) {
+                        s.SwitchTo_Base();
+                        /*System.out.println("swtiched tobase param");*/
+                    }
+                }
                 if (keyEvent.isShiftDown()) {
-                    if (keyEvent.isShiftDown()) {
+                     {
                         if (keyEvent.getCode() == KeyCode.W) {
                             for (Spider spider : uni) {
                                 if (spider.isActive()) {
@@ -918,9 +1138,6 @@ public class Main extends Application {
                                 }
                             }
                         }
-                    }
-                    if (keyEvent.getCode() == KeyCode.I) {
-                        drawInfo();
                     }
                 }
 

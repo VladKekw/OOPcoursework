@@ -20,7 +20,7 @@ public class IceElemental extends Golem{
 
         init(counter,posX,posY,true);
         System.out.println("an ice elemental has been created");
-
+        logger.log(this.toString());
         this.g.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -30,6 +30,32 @@ public class IceElemental extends Golem{
         });
 
     }
+    public IceElemental(int healthPoint, double damage, String n, String s, double posX, double posY, String[] spiderN , boolean active, double counsec) {
+        counter = new SurvivedCounter();
+        counter.setSecondsSurvived((int)counsec);
+        this.active =active;
+        this.x = posX;
+        this.y = posY;
+        this.damage = damage;
+        this.healthPoint = healthPoint;
+        this.sideS = s;
+        this.nameS = n;
+        this.i = new Image(Main.class.getResource("ice.png").toString(), 75, 75, false, false);
+        imageView.setImage(i);
+        imageView.setX(x - 3);
+        imageView.setY(y + 15);
+        init(counter, posX, posY, true);
+        predictTheWin();
+        logger.log(this.toString());
+        System.out.println("Customised ice elemental has been created");
+
+        this.g.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if (event.getButton().equals(MouseButton.PRIMARY)) switchActivation();
+            }
+        });
+    }
 
     public IceElemental(){
         super(100,100,"FrozenElem","",0,0,Main.bodya);
@@ -38,10 +64,12 @@ public class IceElemental extends Golem{
         SurvivedCounter counter = new SurvivedCounter();
         this.g.relocate(20,20);
         init(counter,0,0,true);
+        System.out.println(" ice elemental without parameters has been created");
+        logger.log(this.toString());
     }
     @Override
     public void receiveDamageFromObjects(Spider target) {
-        target.setHealthPoint((Integer.parseInt(target.getHealthPoint())) - 3);
+        target.setHealthPoint((Integer.parseInt(target.getHealthPoint())) - 0.01);
 
     }
 

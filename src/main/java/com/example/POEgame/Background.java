@@ -19,9 +19,9 @@ public class Background {
     static Group gr = new Group();
     static Group g;
     Background() throws FileNotFoundException {
-        img = new Image(Main.class.getResource("background.jpg").toString(),4060,2900,false,false);
+        img = new Image(Main.class.getResource("background.jpg").toString(),3060,2000,false,false);
         ImageView imageView = new ImageView(img);
-        imageView.setFitWidth(3060);
+        imageView.setFitWidth(3000);
         imageView.setFitHeight(2000);
         this.iv = imageView;
 

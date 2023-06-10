@@ -20,12 +20,12 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 public class DireBase {
-    private Image i;
-    private ImageView iv;
-    private Rectangle r;
+    public Image i;
+    public ImageView iv;
+    public Rectangle r;
     public Group direBaseGroup;
     public static ArrayList<Spider> direBaseList = new ArrayList<>();
-    private Label l;
+    public Label l;
 
     DireBase(double x, double y) throws FileNotFoundException {
 

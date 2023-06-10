@@ -1,6 +1,7 @@
 package com.example.POEgame;
 
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -63,26 +64,37 @@ public class Tower {
                 window.setTitle("List of units in this tower");
                 window.setMinWidth(200);
                 window.setMinHeight(100);
-                VBox layout = new VBox();
+                VBox layout = new VBox(20);
+                Label stateLabel = new Label(getState().name());
+                stateLabel.setLayoutX(100);
+                stateLabel.setLayoutY(120);
+                layout.setAlignment(Pos.CENTER);
                 ComboBox cBox = new ComboBox();
+                cBox.setLayoutX(100);
+                cBox.setLayoutY(25);
                 int count = 1;
                 for (Spider spider : list) {
                     cBox.getItems().add(count + " " + spider);
                 }
                 Button okButton = new Button("OK");
+                okButton.setLayoutX(100);
+                okButton.setLayoutY(65);
+
                 okButton.setOnAction(e -> {
                     String[] str = cBox.getValue().toString().split(" ");
                     System.out.println(str[0]);
                     for (int i = 0; i < list.size(); i++) {
                         Spider spider = list.get(Integer.parseInt(str[0]) - 1);
-                        /*spider.spawnBack(spider);*/
                         spider.setSafe(false);
+                        spider.getGroupP().setLayoutX(Double.parseDouble(spider.getPosX()) +70.0);
+                        spider.getGroupP().setLayoutY(Double.parseDouble(spider.getPosY()) +70.0);
                         spider.getGroup(spider).setVisible(true);
+
                         list.remove(Integer.parseInt(str[0]) - 1);
                     }
                     window.close();
                 });
-                layout.getChildren().addAll(cBox, okButton);
+                layout.getChildren().addAll(cBox, okButton,stateLabel);
                 Scene scene = new Scene(layout, 300, 150);
                 window.setScene(scene);
                 window.showAndWait();

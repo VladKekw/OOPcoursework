@@ -23,9 +23,9 @@ import java.util.ArrayList;
 public class RadBase {
     public static ArrayList<Spider> radiantBaseList = new ArrayList<>();
 
-    private Image i;
-    private ImageView iv;
-    private Rectangle r;
+    public Image i;
+    public ImageView iv;
+    public Rectangle r;
     public Group RadiantBaseGroup;
 
     private Label l;
